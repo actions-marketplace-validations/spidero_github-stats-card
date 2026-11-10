@@ -1,5 +1,5 @@
-# Reusable workflow: generates the stats card and pushes it to a branch
-# (default "output"), updating only the card files so other files there stay.
+# Reusable workflow: generates the stats cards and pushes them to a branch
+# (default "output"), updating only the card files (github-*.svg) so other files there stay.
 name: Stats card (reusable)
 
 on:
@@ -9,6 +9,14 @@ on:
         description: GitHub username (defaults to the repository owner).
         type: string
         default: ""
+      cards:
+        description: Comma-separated cards (stats, languages) or "all".
+        type: string
+        default: stats
+      include_private:
+        description: Include private repos where a card supports it (needs the token secret).
+        type: boolean
+        default: false
       branch:
         description: Branch the SVG files are pushed to.
         type: string
@@ -37,6 +45,8 @@ jobs:
           github_user_name: ${{ inputs.github_user_name || github.repository_owner }}
           output_dir: ${{ runner.temp }}/card
           token: ${{ secrets.token || github.token }}
+          cards: ${{ inputs.cards }}
+          include_private: ${{ inputs.include_private }}
           title: ${{ inputs.title }}
           themes: ${{ inputs.themes }}
 
@@ -56,11 +66,11 @@ jobs:
           else
             git checkout -q --orphan "$BRANCH"
           fi
-          cp "$SRC"/github-stats*.svg .
-          git add github-stats*.svg
+          cp "$SRC"/github-*.svg .
+          git add github-*.svg
           if git diff --cached --quiet; then
             echo "No changes"
           else
-            git commit -q -m "Update GitHub stats card"
+            git commit -q -m "Update GitHub stats cards"
             git push -q origin "HEAD:$BRANCH"
           fi

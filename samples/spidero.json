@@ -1,0 +1,132 @@
+{
+  "languages": {
+    "name": "Piotr Skwarna",
+    "include_private": true,
+    "languages": [
+      {
+        "name": "C++",
+        "size": 7049541,
+        "color": "#f34b7d"
+      },
+      {
+        "name": "PHP",
+        "size": 5244918,
+        "color": "#4F5D95"
+      },
+      {
+        "name": "C",
+        "size": 2820738,
+        "color": "#555555"
+      },
+      {
+        "name": "HTML",
+        "size": 1224786,
+        "color": "#e34c26"
+      },
+      {
+        "name": "Smarty",
+        "size": 530305,
+        "color": "#f0c040"
+      },
+      {
+        "name": "Python",
+        "size": 497087,
+        "color": "#3572A5"
+      },
+      {
+        "name": "JavaScript",
+        "size": 415957,
+        "color": "#f1e05a"
+      },
+      {
+        "name": "CSS",
+        "size": 340941,
+        "color": "#663399"
+      },
+      {
+        "name": "Shell",
+        "size": 133656,
+        "color": "#89e051"
+      },
+      {
+        "name": "Blade",
+        "size": 107482,
+        "color": "#f7523f"
+      },
+      {
+        "name": "TypeScript",
+        "size": 105812,
+        "color": "#3178c6"
+      },
+      {
+        "name": "Twig",
+        "size": 38394,
+        "color": "#c1d026"
+      },
+      {
+        "name": "CMake",
+        "size": 33548,
+        "color": "#DA3434"
+      },
+      {
+        "name": "Java",
+        "size": 16841,
+        "color": "#b07219"
+      },
+      {
+        "name": "Dockerfile",
+        "size": 11893,
+        "color": "#384d54"
+      },
+      {
+        "name": "Hack",
+        "size": 11514,
+        "color": "#878787"
+      },
+      {
+        "name": "Processing",
+        "size": 9348,
+        "color": "#0096D8"
+      },
+      {
+        "name": "HCL",
+        "size": 8706,
+        "color": "#844FBA"
+      },
+      {
+        "name": "Vue",
+        "size": 5360,
+        "color": "#41b883"
+      },
+      {
+        "name": "Go Template",
+        "size": 3436,
+        "color": "#00ADD8"
+      },
+      {
+        "name": "Makefile",
+        "size": 1983,
+        "color": "#427819"
+      },
+      {
+        "name": "C#",
+        "size": 1416,
+        "color": "#7355dd"
+      }
+    ]
+  },
+  "stats": {
+    "name": "Piotr Skwarna",
+    "year": 2026,
+    "stars": 11,
+    "forks": 2,
+    "repos": 22,
+    "commits": 61,
+    "prs": 177,
+    "issues": 15,
+    "contributed": 2,
+    "followers": 2,
+    "contributions": 1252,
+    "private": 1167
+  }
+}

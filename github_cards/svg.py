@@ -1,0 +1,96 @@
+"""SVG building blocks shared by cards."""
+import datetime as dt
+from xml.sax.saxutils import escape
+
+from .themes import THEMES
+
+FONT = "'Segoe UI', Ubuntu, 'Helvetica Neue', Arial, sans-serif"
+WIDTH = 495
+
+__all__ = ["FONT", "WIDTH", "escape", "human", "card", "stat_row", "ring", "bar"]
+
+
+def human(n):
+    """Exact value below 10k, short form above (12.3k, 2.5M)."""
+    if n >= 1_000_000:
+        return f"{n / 1_000_000:.1f}".rstrip("0").rstrip(".") + "M"
+    if n >= 10_000:
+        return f"{n / 1_000:.1f}".rstrip("0").rstrip(".") + "k"
+    return str(n)
+
+
+def card(theme, title, body, height, width=WIDTH, extra_css="", footer=True):
+    """Wrap `body` (SVG markup) in a themed card with a title and "updated" footer."""
+    c = THEMES[theme]
+    title = escape(title)
+    foot = ""
+    if footer:
+        updated = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
+        foot = (f'<text x="{width - 25}" y="{height - 12}" text-anchor="end" '
+                f'class="small">updated {updated}</text>')
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-label="{title}">
+<title>{title}</title>
+<style>
+  .title {{ font: 600 18px {FONT}; fill: {c["title"]}; }}
+  .label {{ font: 600 13px {FONT}; fill: {c["label"]}; }}
+  .value {{ font: 700 13px {FONT}; fill: {c["value"]}; }}
+  .big {{ font: 700 22px {FONT}; fill: {c["value"]}; }}
+  .small {{ font: 400 10px {FONT}; fill: {c["label"]}; }}
+  .fade {{ opacity: 0; animation: fade .5s ease-in-out forwards; }}
+  @keyframes fade {{ to {{ opacity: 1; }} }}
+{extra_css}
+</style>
+<rect x="0.5" y="0.5" width="{width - 1}" height="{height - 1}" rx="6" fill="{c["bg"]}" stroke="{c["border"]}"/>
+<text x="25" y="35" class="title">{title}</text>
+{body}
+{foot}
+</svg>
+"""
+
+
+def stat_row(theme, i, label, value, y0=70, step=22, value_x=265):
+    """One "■ Label: value" row; `i` is the row index (position + fade-in delay)."""
+    c = THEMES[theme]
+    y = y0 + i * step
+    return (
+        f'<g class="fade" style="animation-delay:{150 + i * 120}ms">'
+        f'<rect x="25" y="{y - 9}" width="8" height="8" rx="2" fill="{c["accent"]}"/>'
+        f'<text x="43" y="{y}" class="label">{escape(label)}:</text>'
+        f'<text x="{value_x}" y="{y}" class="value">{escape(str(value))}</text></g>'
+    )
+
+
+def ring(theme, cx, cy, r, big, lines=(), fraction=1.0, width=8):
+    """Animated progress ring with a big value and small caption lines inside."""
+    c = THEMES[theme]
+    circ = 2 * 3.14159 * r
+    end = circ * (1 - max(0.0, min(1.0, fraction)))
+    caption = "".join(
+        f'<text x="{cx}" y="{cy + 20 + 12 * i}" text-anchor="middle" class="small">{escape(t)}</text>'
+        for i, t in enumerate(lines)
+    )
+    return f"""<style>
+  .ring {{ stroke-dasharray: {circ:.1f}; stroke-dashoffset: {circ:.1f}; animation: draw 1.2s ease-out forwards; }}
+  @keyframes draw {{ to {{ stroke-dashoffset: {end:.1f}; }} }}
+</style>
+<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{c["track"]}" stroke-width="{width}"/>
+<circle class="ring" cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{c["accent"]}" stroke-width="{width}" stroke-linecap="round" transform="rotate(-90 {cx} {cy})"/>
+<text x="{cx}" y="{cy + 4}" text-anchor="middle" class="big">{escape(str(big))}</text>
+{caption}"""
+
+
+def bar(theme, x, y, width, height, parts, gap=2):
+    """Horizontal stacked bar. `parts` = [(fraction, color), ...], fractions sum to ~1."""
+    c = THEMES[theme]
+    clip = f"bar{x}{y}"
+    out = [f'<clipPath id="{clip}"><rect x="{x}" y="{y}" width="{width}" height="{height}" rx="{height / 2}"/></clipPath>',
+           f'<g clip-path="url(#{clip})"><rect x="{x}" y="{y}" width="{width}" height="{height}" fill="{c["track"]}"/>']
+    pos = x
+    for frac, color in parts:
+        w = width * frac
+        if w <= 0:
+            continue
+        out.append(f'<rect x="{pos:.1f}" y="{y}" width="{max(w - gap, 0.5):.1f}" height="{height}" fill="{color}"/>')
+        pos += w
+    out.append("</g>")
+    return "".join(out)

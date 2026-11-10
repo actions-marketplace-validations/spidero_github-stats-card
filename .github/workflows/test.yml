@@ -18,21 +18,31 @@ jobs:
         with:
           github_user_name: ${{ github.repository_owner }}
           output_dir: dist
+          cards: all
 
-      - name: Check output
+      - name: Check output (every card x theme)
         run: |
           set -euo pipefail
-          for f in dist/github-stats.svg dist/github-stats-dark.svg; do
-            grep -q '<svg' "$f" && echo "ok: $f"
+          for card in $(python3 -m github_cards --list | awk '{print $1}'); do
+            for f in "dist/github-$card.svg" "dist/github-$card-dark.svg"; do
+              grep -q '<svg' "$f" && echo "ok: $f"
+            done
           done
+
+      - name: Offline preview from sample data
+        run: python3 preview.py && ls preview/
 
       - uses: actions/upload-artifact@v7
         with:
-          name: card
-          path: dist/
+          name: cards
+          path: |
+            dist/
+            preview/
 
   reusable:
     # Exercises the reusable workflow end-to-end (pushes to the "output" branch here)
     uses: ./.github/workflows/card.yml
+    with:
+      cards: all
     permissions:
       contents: write

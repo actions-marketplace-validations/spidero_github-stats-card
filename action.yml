@@ -1,5 +1,5 @@
 name: GitHub Stats Card
-description: Generate a simple, self-hosted GitHub stats card (SVG, light and dark) without external services.
+description: Generate simple, self-hosted GitHub stats cards (SVG, light and dark) without external services.
 author: spidero
 branding:
   icon: bar-chart-2
@@ -9,6 +9,10 @@ inputs:
   github_user_name:
     description: GitHub username to generate the card for.
     required: true
+  cards:
+    description: Comma-separated cards to generate (stats, languages) or "all".
+    required: false
+    default: stats
   output_dir:
     description: Directory where the SVG files are written.
     required: false
@@ -19,8 +23,14 @@ inputs:
       public data; use a personal access token (read-only) to include private repos.
     required: false
     default: ${{ github.token }}
+  include_private:
+    description: >
+      "true" to include private repositories where a card supports it (e.g. languages).
+      Needs a personal access token in `token`.
+    required: false
+    default: "false"
   title:
-    description: Card title. Defaults to "<name>'s GitHub Stats".
+    description: Custom title (applies to every selected card). Each card has its own default.
     required: false
     default: ""
   themes:
@@ -40,6 +50,10 @@ runs:
         CARD_OUT: ${{ inputs.output_dir }}
         CARD_TITLE: ${{ inputs.title }}
         CARD_THEMES: ${{ inputs.themes }}
+        CARD_CARDS: ${{ inputs.cards }}
+        CARD_PRIVATE: ${{ inputs.include_private }}
       run: |
-        python3 "$GITHUB_ACTION_PATH/stats.py" "$CARD_USER" "$CARD_OUT" \
-          --title "$CARD_TITLE" --themes "$CARD_THEMES"
+        extra=()
+        [ "$CARD_PRIVATE" = "true" ] && extra+=(--include-private)
+        PYTHONPATH="$GITHUB_ACTION_PATH" python3 -m github_cards "$CARD_USER" "$CARD_OUT" \
+          --cards "$CARD_CARDS" --title "$CARD_TITLE" --themes "$CARD_THEMES" "${extra[@]}"
