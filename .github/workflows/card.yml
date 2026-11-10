@@ -1,0 +1,66 @@
+# Reusable workflow: generates the stats card and pushes it to a branch
+# (default "output"), updating only the card files so other files there stay.
+name: Stats card (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      github_user_name:
+        description: GitHub username (defaults to the repository owner).
+        type: string
+        default: ""
+      branch:
+        description: Branch the SVG files are pushed to.
+        type: string
+        default: output
+      title:
+        type: string
+        default: ""
+      themes:
+        type: string
+        default: light,dark
+    secrets:
+      token:
+        description: Optional personal access token (read-only) to include private repos.
+        required: false
+
+jobs:
+  card:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Generate card
+        uses: spidero/github-stats-card@v1
+        with:
+          github_user_name: ${{ inputs.github_user_name || github.repository_owner }}
+          output_dir: ${{ runner.temp }}/card
+          token: ${{ secrets.token || github.token }}
+          title: ${{ inputs.title }}
+          themes: ${{ inputs.themes }}
+
+      - name: Push to branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ inputs.branch }}
+          SRC: ${{ runner.temp }}/card
+        run: |
+          set -euo pipefail
+          git init -q site && cd site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git fetch -q --depth 1 origin "$BRANCH"; then
+            git checkout -q -b "$BRANCH" FETCH_HEAD
+          else
+            git checkout -q --orphan "$BRANCH"
+          fi
+          cp "$SRC"/github-stats*.svg .
+          git add github-stats*.svg
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -q -m "Update GitHub stats card"
+            git push -q origin "HEAD:$BRANCH"
+          fi

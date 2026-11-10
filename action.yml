@@ -1,0 +1,45 @@
+name: GitHub Stats Card
+description: Generate a simple, self-hosted GitHub stats card (SVG, light and dark) without external services.
+author: spidero
+branding:
+  icon: bar-chart-2
+  color: blue
+
+inputs:
+  github_user_name:
+    description: GitHub username to generate the card for.
+    required: true
+  output_dir:
+    description: Directory where the SVG files are written.
+    required: false
+    default: dist
+  token:
+    description: >
+      Token used to query the GitHub GraphQL API. The default GITHUB_TOKEN only sees
+      public data; use a personal access token (read-only) to include private repos.
+    required: false
+    default: ${{ github.token }}
+  title:
+    description: Card title. Defaults to "<name>'s GitHub Stats".
+    required: false
+    default: ""
+  themes:
+    description: Comma-separated list of themes to render (light, dark).
+    required: false
+    default: light,dark
+
+runs:
+  using: composite
+  steps:
+    - name: Generate stats card
+      shell: bash
+      # Inputs are passed via env to avoid shell injection
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+        CARD_USER: ${{ inputs.github_user_name }}
+        CARD_OUT: ${{ inputs.output_dir }}
+        CARD_TITLE: ${{ inputs.title }}
+        CARD_THEMES: ${{ inputs.themes }}
+      run: |
+        python3 "$GITHUB_ACTION_PATH/stats.py" "$CARD_USER" "$CARD_OUT" \
+          --title "$CARD_TITLE" --themes "$CARD_THEMES"
