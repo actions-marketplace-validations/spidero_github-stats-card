@@ -30,3 +30,9 @@ jobs:
         with:
           name: card
           path: dist/
+
+  reusable:
+    # Exercises the reusable workflow end-to-end (pushes to the "output" branch here)
+    uses: ./.github/workflows/card.yml
+    permissions:
+      contents: write
