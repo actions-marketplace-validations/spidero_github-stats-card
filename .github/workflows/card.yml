@@ -17,6 +17,10 @@ on:
         description: Include private repos where a card supports it (needs the token secret).
         type: boolean
         default: false
+      show_credit:
+        description: Show the small project link in the bottom-left corner.
+        type: boolean
+        default: true
       branch:
         description: Branch the SVG files are pushed to.
         type: string
@@ -47,6 +51,7 @@ jobs:
           token: ${{ secrets.token || github.token }}
           cards: ${{ inputs.cards }}
           include_private: ${{ inputs.include_private }}
+          show_credit: ${{ inputs.show_credit }}
           title: ${{ inputs.title }}
           themes: ${{ inputs.themes }}
 

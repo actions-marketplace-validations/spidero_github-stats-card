@@ -56,6 +56,7 @@ Optional inputs of the reusable workflow:
 | `github_user_name` | repository owner          | User to generate the card for  |
 | `cards`            | `stats`                   | Comma-separated cards or `all` |
 | `include_private`  | `false`                   | Use private repos (needs `token`) |
+| `show_credit`      | `true`                    | Small project link in the corner |
 | `branch`           | `output`                  | Branch the SVG files go to     |
 | `title`            | per card                  | Custom title (all cards)       |
 | `themes`           | `light,dark`              | Themes to render               |
@@ -92,6 +93,7 @@ Then publish `dist/` the same way you publish your other files.
 | `github_user_name` | (required)            | User to generate the card for       |
 | `cards`            | `stats`               | Comma-separated cards or `all`      |
 | `include_private`  | `false`               | Use private repos (needs a PAT)     |
+| `show_credit`      | `true`                | Small project link in the corner    |
 | `output_dir`       | `dist`                | Where the SVG files are written     |
 | `token`            | `github.token`        | Token for the GitHub GraphQL API    |
 | `title`            | per card              | Custom title (all cards)            |

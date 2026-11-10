@@ -6,6 +6,9 @@ from .themes import THEMES
 
 FONT = "'Segoe UI', Ubuntu, 'Helvetica Neue', Arial, sans-serif"
 WIDTH = 495
+REPO = "spidero/github-stats-card"
+# Small credit in the bottom-left corner; the CLI turns it off with --no-credit
+SHOW_CREDIT = True
 
 __all__ = ["FONT", "WIDTH", "escape", "human", "card", "stat_row", "ring", "bar"]
 
@@ -28,6 +31,9 @@ def card(theme, title, body, height, width=WIDTH, extra_css="", footer=True):
         updated = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
         foot = (f'<text x="{width - 25}" y="{height - 12}" text-anchor="end" '
                 f'class="small">updated {updated}</text>')
+        if SHOW_CREDIT:
+            foot += (f'<a href="https://github.com/{REPO}" target="_blank">'
+                     f'<text x="25" y="{height - 12}" class="small credit">{REPO}</text></a>')
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-label="{title}">
 <title>{title}</title>
 <style>
@@ -36,6 +42,7 @@ def card(theme, title, body, height, width=WIDTH, extra_css="", footer=True):
   .value {{ font: 700 13px {FONT}; fill: {c["value"]}; }}
   .big {{ font: 700 22px {FONT}; fill: {c["value"]}; }}
   .small {{ font: 400 10px {FONT}; fill: {c["label"]}; }}
+  .credit {{ opacity: .55; }}
   .fade {{ opacity: 0; animation: fade .5s ease-in-out forwards; }}
   @keyframes fade {{ to {{ opacity: 1; }} }}
 {extra_css}

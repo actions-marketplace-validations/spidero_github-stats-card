@@ -4,24 +4,9 @@
     "include_private": true,
     "languages": [
       {
-        "name": "C++",
-        "size": 7049541,
-        "color": "#f34b7d"
-      },
-      {
         "name": "PHP",
         "size": 5244918,
         "color": "#4F5D95"
-      },
-      {
-        "name": "C",
-        "size": 2820738,
-        "color": "#555555"
-      },
-      {
-        "name": "HTML",
-        "size": 1224786,
-        "color": "#e34c26"
       },
       {
         "name": "Smarty",
@@ -30,22 +15,22 @@
       },
       {
         "name": "Python",
-        "size": 497087,
+        "size": 310688,
         "color": "#3572A5"
       },
       {
-        "name": "JavaScript",
-        "size": 415957,
-        "color": "#f1e05a"
-      },
-      {
         "name": "CSS",
-        "size": 340941,
+        "size": 228824,
         "color": "#663399"
       },
       {
+        "name": "JavaScript",
+        "size": 124438,
+        "color": "#f1e05a"
+      },
+      {
         "name": "Shell",
-        "size": 133656,
+        "size": 121485,
         "color": "#89e051"
       },
       {
@@ -64,9 +49,14 @@
         "color": "#c1d026"
       },
       {
-        "name": "CMake",
-        "size": 33548,
-        "color": "#DA3434"
+        "name": "HTML",
+        "size": 37901,
+        "color": "#e34c26"
+      },
+      {
+        "name": "C++",
+        "size": 37121,
+        "color": "#f34b7d"
       },
       {
         "name": "Java",
@@ -84,11 +74,6 @@
         "color": "#878787"
       },
       {
-        "name": "Processing",
-        "size": 9348,
-        "color": "#0096D8"
-      },
-      {
         "name": "HCL",
         "size": 8706,
         "color": "#844FBA"
@@ -99,14 +84,14 @@
         "color": "#41b883"
       },
       {
+        "name": "C",
+        "size": 3703,
+        "color": "#555555"
+      },
+      {
         "name": "Go Template",
         "size": 3436,
         "color": "#00ADD8"
-      },
-      {
-        "name": "Makefile",
-        "size": 1983,
-        "color": "#427819"
       },
       {
         "name": "C#",
@@ -121,12 +106,12 @@
     "stars": 11,
     "forks": 2,
     "repos": 22,
-    "commits": 61,
+    "commits": 64,
     "prs": 177,
     "issues": 15,
     "contributed": 2,
-    "followers": 2,
-    "contributions": 1252,
-    "private": 1167
+    "followers": 3,
+    "contributions": 1256,
+    "private": 1168
   }
 }

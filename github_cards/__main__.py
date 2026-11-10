@@ -3,6 +3,7 @@ import argparse
 import json
 import os
 
+from . import svg
 from .api import GitHubAPI
 from .cards import load_cards
 from .themes import THEMES
@@ -26,6 +27,8 @@ def main():
     ap.add_argument("--title", default="", help="custom title (applies to every selected card)")
     ap.add_argument("--include-private", action="store_true",
                     help="cards that support it also use private repos (needs a PAT)")
+    ap.add_argument("--no-credit", action="store_true",
+                    help="hide the small project link in the bottom-left corner")
     ap.add_argument("--data", help="render from a JSON file (from --dump-data) instead of the API")
     ap.add_argument("--dump-data", help="also save fetched data to this JSON file")
     ap.add_argument("--list", action="store_true", help="list available cards and exit")
@@ -67,6 +70,7 @@ def main():
             f.write("\n")
         print(f"wrote {args.dump_data}")
 
+    svg.SHOW_CREDIT = not args.no_credit
     os.makedirs(args.out_dir, exist_ok=True)
     for name in names:
         for theme in themes:
