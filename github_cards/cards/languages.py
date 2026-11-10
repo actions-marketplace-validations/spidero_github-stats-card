@@ -1,4 +1,5 @@
 """Top languages across your own (non-fork) repositories, by code size."""
+from ..repo_filter import hidden, keep_repo
 from ..svg import card, escape, bar
 from ..themes import THEMES
 
@@ -13,6 +14,8 @@ query($login: String!, $privacy: RepositoryPrivacy, $cursor: String) {
     repositories(first: 100, after: $cursor, ownerAffiliations: OWNER, isFork: false, privacy: $privacy) {
       pageInfo { hasNextPage endCursor }
       nodes {
+        name
+        isArchived
         languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
           edges { size node { name color } }
         }
@@ -31,6 +34,8 @@ def fetch(api, login, options):
     for page in api.paginate(QUERY, ["user", "repositories"], login=login, privacy=privacy):
         user = page["user"]
         for repo in user["repositories"]["nodes"]:
+            if not keep_repo(repo, options):
+                continue
             for edge in repo["languages"]["edges"]:
                 name = edge["node"]["name"]
                 sizes[name] = sizes.get(name, 0) + edge["size"]
@@ -43,8 +48,10 @@ def fetch(api, login, options):
     }
 
 
-def render(data, theme, title=None):
-    langs = data["languages"]
+def render(data, theme, options):
+    # `hide` removes languages (case-insensitive); percentages are recomputed without them
+    hide = hidden(options)
+    langs = [l for l in data["languages"] if l["name"].lower() not in hide]
     total = sum(l["size"] for l in langs) or 1
     top, rest = langs[:TOP], langs[TOP:]
     items = [(l["name"], l["size"] / total, l["color"] or THEMES[theme]["accent"]) for l in top]
@@ -64,4 +71,4 @@ def render(data, theme, title=None):
         )
     rows = (len(items) + 1) // 2
     height = 92 + max(rows, 1) * 24 + 16
-    return card(theme, title or "Most Used Languages", "".join(body), height=height)
+    return card(theme, options.get("title") or "Most Used Languages", "".join(body), height=height)

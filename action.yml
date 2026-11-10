@@ -10,7 +10,7 @@ inputs:
     description: GitHub username to generate the card for.
     required: true
   cards:
-    description: Comma-separated cards to generate (stats, languages) or "all".
+    description: Comma-separated cards to generate (stats, languages, streak) or "all".
     required: false
     default: stats
   output_dir:
@@ -27,6 +27,20 @@ inputs:
     description: >
       "true" to include private repositories where a card supports it (e.g. languages).
       Needs a personal access token in `token`.
+    required: false
+    default: "false"
+  hide:
+    description: >
+      Comma-separated items to hide: stats rows (stars, commits, private, prs, issues,
+      contributed, repos) and/or language names (e.g. "issues,html,css").
+    required: false
+    default: ""
+  exclude_repos:
+    description: Comma-separated repository names to skip (stars, repo count, languages).
+    required: false
+    default: ""
+  exclude_archived:
+    description: '"true" skips archived repositories (stars, repo count, languages).'
     required: false
     default: "false"
   show_credit:
@@ -57,9 +71,14 @@ runs:
         CARD_CARDS: ${{ inputs.cards }}
         CARD_PRIVATE: ${{ inputs.include_private }}
         CARD_CREDIT: ${{ inputs.show_credit }}
+        CARD_HIDE: ${{ inputs.hide }}
+        CARD_EXCLUDE: ${{ inputs.exclude_repos }}
+        CARD_EXCL_ARCHIVED: ${{ inputs.exclude_archived }}
       run: |
         extra=()
         [ "$CARD_PRIVATE" = "true" ] && extra+=(--include-private)
         [ "$CARD_CREDIT" = "false" ] && extra+=(--no-credit)
+        [ "$CARD_EXCL_ARCHIVED" = "true" ] && extra+=(--exclude-archived)
         PYTHONPATH="$GITHUB_ACTION_PATH" python3 -m github_cards "$CARD_USER" "$CARD_OUT" \
-          --cards "$CARD_CARDS" --title "$CARD_TITLE" --themes "$CARD_THEMES" "${extra[@]}"
+          --cards "$CARD_CARDS" --title "$CARD_TITLE" --themes "$CARD_THEMES" \
+          --hide "$CARD_HIDE" --exclude-repos "$CARD_EXCLUDE" "${extra[@]}"

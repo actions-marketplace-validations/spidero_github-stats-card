@@ -27,6 +27,11 @@ def main():
     ap.add_argument("--title", default="", help="custom title (applies to every selected card)")
     ap.add_argument("--include-private", action="store_true",
                     help="cards that support it also use private repos (needs a PAT)")
+    ap.add_argument("--hide", default="",
+                    help="comma-separated items to hide: stats rows (stars, commits, private, prs, "
+                         "issues, contributed, repos) and/or language names")
+    ap.add_argument("--exclude-repos", default="", help="comma-separated repository names to skip")
+    ap.add_argument("--exclude-archived", action="store_true", help="skip archived repositories")
     ap.add_argument("--no-credit", action="store_true",
                     help="hide the small project link in the bottom-left corner")
     ap.add_argument("--data", help="render from a JSON file (from --dump-data) instead of the API")
@@ -46,6 +51,14 @@ def main():
     if not themes or set(themes) - set(THEMES):
         ap.error(f"unknown theme(s): {sorted(set(themes) - set(THEMES))}; available: {', '.join(THEMES)}")
 
+    options = {
+        "title": args.title or None,
+        "hide": split(args.hide),
+        "include_private": args.include_private,
+        "exclude_repos": split(args.exclude_repos),
+        "exclude_archived": args.exclude_archived,
+    }
+
     if args.data:
         with open(args.data, encoding="utf-8") as f:
             data = json.load(f)
@@ -59,7 +72,6 @@ def main():
         if not token:
             raise SystemExit("GITHUB_TOKEN is not set")
         api = GitHubAPI(token)
-        options = {"include_private": args.include_private}
         data = {n: cards[n].fetch(api, args.login, options) for n in names}
         print(json.dumps(data, indent=2))
 
@@ -76,7 +88,7 @@ def main():
         for theme in themes:
             path = os.path.join(args.out_dir, output_name(name, theme))
             with open(path, "w", encoding="utf-8") as f:
-                f.write(cards[name].render(data[name], theme, args.title or None))
+                f.write(cards[name].render(data[name], theme, options))
             print(f"wrote {path}")
 
 

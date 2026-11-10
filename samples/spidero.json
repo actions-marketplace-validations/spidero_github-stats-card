@@ -15,7 +15,7 @@
       },
       {
         "name": "Python",
-        "size": 310688,
+        "size": 311245,
         "color": "#3572A5"
       },
       {
@@ -103,15 +103,31 @@
   "stats": {
     "name": "Piotr Skwarna",
     "year": 2026,
-    "stars": 11,
+    "stars": 12,
     "forks": 2,
     "repos": 22,
-    "commits": 64,
+    "commits": 65,
     "prs": 177,
     "issues": 15,
     "contributed": 2,
     "followers": 3,
-    "contributions": 1256,
+    "contributions": 1257,
     "private": 1168
+  },
+  "streak": {
+    "name": "Piotr Skwarna",
+    "total": 1694,
+    "first": "2012-07-05",
+    "today": "2026-11-10",
+    "current": {
+      "length": 23,
+      "start": "2026-10-19",
+      "end": "2026-11-10"
+    },
+    "longest": {
+      "length": 25,
+      "start": "2026-09-14",
+      "end": "2026-10-08"
+    }
   }
 }

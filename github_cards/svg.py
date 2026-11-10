@@ -10,7 +10,7 @@ REPO = "spidero/github-stats-card"
 # Small credit in the bottom-left corner; the CLI turns it off with --no-credit
 SHOW_CREDIT = True
 
-__all__ = ["FONT", "WIDTH", "escape", "human", "card", "stat_row", "ring", "bar"]
+__all__ = ["FONT", "WIDTH", "escape", "human", "card", "stat_row", "ring", "bar", "fmt_date"]
 
 
 def human(n):
@@ -43,8 +43,10 @@ def card(theme, title, body, height, width=WIDTH, extra_css="", footer=True):
   .big {{ font: 700 22px {FONT}; fill: {c["value"]}; }}
   .small {{ font: 400 10px {FONT}; fill: {c["label"]}; }}
   .credit {{ opacity: .55; }}
-  .fade {{ opacity: 0; animation: fade .5s ease-in-out forwards; }}
-  @keyframes fade {{ to {{ opacity: 1; }} }}
+  /* Visible by default; the animation only fades in from 0 (no-animation renderers show the final state) */
+  .fade {{ animation: fade .5s ease-in-out backwards; }}
+  @keyframes fade {{ from {{ opacity: 0; }} }}
+  @media (prefers-reduced-motion: reduce) {{ * {{ animation: none !important; }} }}
 {extra_css}
 </style>
 <rect x="0.5" y="0.5" width="{width - 1}" height="{height - 1}" rx="6" fill="{c["bg"]}" stroke="{c["border"]}"/>
@@ -67,22 +69,24 @@ def stat_row(theme, i, label, value, y0=70, step=22, value_x=265):
     )
 
 
-def ring(theme, cx, cy, r, big, lines=(), fraction=1.0, width=8):
+def ring(theme, cx, cy, r, big, lines=(), fraction=1.0, width=8, big_y=None):
     """Animated progress ring with a big value and small caption lines inside."""
     c = THEMES[theme]
     circ = 2 * 3.14159 * r
     end = circ * (1 - max(0.0, min(1.0, fraction)))
+    rid = f"ring{cx}x{cy}"  # unique per ring, so several rings can coexist
+    big_y = cy + 4 if big_y is None else big_y
     caption = "".join(
         f'<text x="{cx}" y="{cy + 20 + 12 * i}" text-anchor="middle" class="small">{escape(t)}</text>'
         for i, t in enumerate(lines)
     )
     return f"""<style>
-  .ring {{ stroke-dasharray: {circ:.1f}; stroke-dashoffset: {circ:.1f}; animation: draw 1.2s ease-out forwards; }}
-  @keyframes draw {{ to {{ stroke-dashoffset: {end:.1f}; }} }}
+  .{rid} {{ stroke-dasharray: {circ:.1f}; stroke-dashoffset: {end:.1f}; animation: {rid} 1.2s ease-out backwards; }}
+  @keyframes {rid} {{ from {{ stroke-dashoffset: {circ:.1f}; }} }}
 </style>
 <circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{c["track"]}" stroke-width="{width}"/>
-<circle class="ring" cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{c["accent"]}" stroke-width="{width}" stroke-linecap="round" transform="rotate(-90 {cx} {cy})"/>
-<text x="{cx}" y="{cy + 4}" text-anchor="middle" class="big">{escape(str(big))}</text>
+<circle class="{rid}" cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{c["accent"]}" stroke-width="{width}" stroke-linecap="round" transform="rotate(-90 {cx} {cy})"/>
+<text x="{cx}" y="{big_y}" text-anchor="middle" class="big">{escape(str(big))}</text>
 {caption}"""
 
 
@@ -101,3 +105,9 @@ def bar(theme, x, y, width, height, parts, gap=2):
         pos += w
     out.append("</g>")
     return "".join(out)
+
+
+def fmt_date(iso):
+    """'2026-03-07' -> 'Mar 7, 2026'."""
+    d = dt.date.fromisoformat(iso)
+    return f"{d.strftime('%b')} {d.day}, {d.year}"

@@ -10,11 +10,14 @@ Every card is rendered in a light and a dark version.
 |-------------|-------|
 | `stats`     | Total stars, commits this year, private contributions (last year), pull requests, issues, repositories contributed to, public repos, total contributions (last year) |
 | `languages` | Top languages by code size in your own (non-fork) repositories |
+| `streak`    | Total contributions since you joined, current and longest daily streak |
 
 <img alt="GitHub stats card" src="https://raw.githubusercontent.com/spidero/spidero/output/github-stats-dark.svg#gh-dark-mode-only">
 <img alt="GitHub stats card" src="https://raw.githubusercontent.com/spidero/spidero/output/github-stats.svg#gh-light-mode-only">
 <img alt="Top languages card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-languages-dark.svg#gh-dark-mode-only">
 <img alt="Top languages card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-languages.svg#gh-light-mode-only">
+<img alt="Streak card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-streak-dark.svg#gh-dark-mode-only">
+<img alt="Streak card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-streak.svg#gh-light-mode-only">
 
 Files are named `github-<card>.svg` (light) and `github-<card>-dark.svg` (dark).
 
@@ -35,7 +38,7 @@ Files are named `github-<card>.svg` (light) and `github-<card>-dark.svg` (dark).
        permissions:
          contents: write
        with:
-         cards: stats,languages   # or "all"
+         cards: stats,languages,streak   # or "all"
    ```
 
 2. Run it once from the **Actions** tab (`Run workflow`).
@@ -56,6 +59,9 @@ Optional inputs of the reusable workflow:
 | `github_user_name` | repository owner          | User to generate the card for  |
 | `cards`            | `stats`                   | Comma-separated cards or `all` |
 | `include_private`  | `false`                   | Use private repos (needs `token`) |
+| `hide`             |                           | Items to hide, see [Options](#options) |
+| `exclude_repos`    |                           | Repository names to skip       |
+| `exclude_archived` | `false`                   | Skip archived repositories     |
 | `show_credit`      | `true`                    | Small project link in the corner |
 | `branch`           | `output`                  | Branch the SVG files go to     |
 | `title`            | per card                  | Custom title (all cards)       |
@@ -93,11 +99,26 @@ Then publish `dist/` the same way you publish your other files.
 | `github_user_name` | (required)            | User to generate the card for       |
 | `cards`            | `stats`               | Comma-separated cards or `all`      |
 | `include_private`  | `false`               | Use private repos (needs a PAT)     |
+| `hide`             |                       | Items to hide, see [Options](#options) |
+| `exclude_repos`    |                       | Repository names to skip            |
+| `exclude_archived` | `false`               | Skip archived repositories          |
 | `show_credit`      | `true`                | Small project link in the corner    |
 | `output_dir`       | `dist`                | Where the SVG files are written     |
 | `token`            | `github.token`        | Token for the GitHub GraphQL API    |
 | `title`            | per card              | Custom title (all cards)            |
 | `themes`           | `light,dark`          | Themes to render                    |
+
+## Options
+
+- `hide`: comma-separated, case-insensitive. Stats rows: `stars`, `commits`, `private`,
+  `prs`, `issues`, `contributed`, `repos`; and/or language names for the `languages` card
+  (percentages are recomputed without them). Example: `hide: issues,private,html,css`.
+- `exclude_repos` / `exclude_archived`: skip repositories when counting stars, public repos
+  and languages. Commits, PRs, issues and contributions are your activity and are reported
+  by GitHub as totals, so they cannot be filtered per repository.
+- Bundled third-party code (e.g. an Arduino `libraries/` folder) inflating languages? Mark it
+  as vendored in that repository's `.gitattributes`, so GitHub stops counting it:
+  `libraries/** linguist-vendored`
 
 ## Private repositories
 
@@ -150,19 +171,21 @@ query($login: String!) {
 
 
 def fetch(api, login, options):
-    # options: {"include_private": bool}
+    # options: title, hide, include_private, exclude_repos, exclude_archived
     # Return plain JSON-serialisable data (it is also saved as sample data)
     user = api.query(QUERY, login=login)["user"]
     return {"name": user["name"] or user["login"], "followers": user["followers"]["totalCount"]}
 
 
-def render(data, theme, title=None):
+def render(data, theme, options):
     body = stat_row(theme, 0, "Followers", data["followers"])
-    return card(theme, title or f"{data['name']}'s followers", body, height=110)
+    return card(theme, options.get("title") or f"{data['name']}'s followers", body, height=110)
 ```
 
 Building blocks in [`github_cards/svg.py`](github_cards/svg.py): `card` (frame, title,
-footer), `stat_row`, `ring`, `bar`, `human` (number formatting). Colors come from
+footer), `stat_row`, `ring`, `bar`, `human` (number formatting), `fmt_date`.
+Use the `fade` class for fade-in; content must stay visible without animations
+(link previews, reduced motion), so animate *from* a hidden state, never *to* a visible one. Colors come from
 [`github_cards/themes.py`](github_cards/themes.py) (`THEMES[theme]["accent"]` etc.);
 adding a theme there makes it available everywhere.
 
