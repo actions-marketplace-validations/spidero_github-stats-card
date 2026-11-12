@@ -6,7 +6,7 @@ import os
 from . import svg
 from .api import GitHubAPI
 from .cards import load_cards
-from .themes import THEMES
+from .themes import THEMES, parse_colors
 
 
 def split(value):
@@ -23,7 +23,12 @@ def main():
     ap.add_argument("login", nargs="?", help="GitHub username")
     ap.add_argument("out_dir", nargs="?", default="dist", help="directory for the SVG files (default: dist)")
     ap.add_argument("--cards", default="stats", help=f"comma-separated, 'all' for every card: {', '.join(cards)}")
-    ap.add_argument("--themes", default="light,dark", help=f"comma-separated: {', '.join(THEMES)}")
+    ap.add_argument("--themes", default="light,dark",
+                    help=f"comma-separated or 'all': {', '.join(THEMES)}")
+    ap.add_argument("--colors", default="",
+                    help="override theme colors, e.g. 'accent=#ff0066,bg=#101010' "
+                         "(keys: bg, bg2, border, title, label, value, accent, track)")
+    ap.add_argument("--org", default="", help="organization login for the 'org' card (default: login)")
     ap.add_argument("--title", default="", help="custom title (applies to every selected card)")
     ap.add_argument("--include-private", action="store_true",
                     help="cards that support it also use private repos (needs a PAT)")
@@ -44,8 +49,17 @@ def main():
             print(f"{name:12} {mod.DESCRIPTION}")
         return
 
-    names = list(cards) if args.cards.strip() == "all" else split(args.cards)
-    themes = split(args.themes)
+    # "all" includes the org card only when an organization is given
+    names = ([n for n in cards if n != "org" or args.org.strip()]
+             if args.cards.strip() == "all" else split(args.cards))
+    themes = list(THEMES) if args.themes.strip() == "all" else split(args.themes)
+    try:
+        overrides = parse_colors(args.colors)
+    except ValueError as e:
+        ap.error(str(e))
+    for t in themes:
+        if t in THEMES:
+            THEMES[t].update(overrides)
     if not names or set(names) - set(cards):
         ap.error(f"unknown card(s): {sorted(set(names) - set(cards))}; available: {', '.join(cards)}")
     if not themes or set(themes) - set(THEMES):
@@ -57,6 +71,7 @@ def main():
         "include_private": args.include_private,
         "exclude_repos": split(args.exclude_repos),
         "exclude_archived": args.exclude_archived,
+        "org": args.org.strip(),
     }
 
     if args.data:

@@ -20,7 +20,8 @@ subprocess.run([sys.executable, "-m", "github_cards", "--data", sample, "--cards
 rows = []
 for name, mod in load_cards().items():
     imgs = "".join(
-        f'<div style="background:{THEMES[t]["bg"]};padding:16px"><img src="{output_name(name, t)}"></div>'
+        f'<div style="background:{"#8a8f98" if THEMES[t]["bg"] == "none" else THEMES[t]["bg"]};padding:16px">'
+        f'<div style="font:12px sans-serif;color:#999">{t}</div><img src="{output_name(name, t)}"></div>'
         for t in THEMES
     )
     rows.append(f"<h2>{name}</h2><p>{mod.DESCRIPTION}</p><div style='display:flex;flex-wrap:wrap;gap:8px'>{imgs}</div>")

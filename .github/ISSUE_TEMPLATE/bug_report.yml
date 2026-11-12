@@ -1,0 +1,50 @@
+name: Bug report
+description: A card is wrong, broken or the action fails
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for the report! Please don't paste tokens or secrets.
+  - type: dropdown
+    id: cards
+    attributes:
+      label: Card(s)
+      multiple: true
+      options: [stats, languages, streak, org, all / not card-specific]
+    validations:
+      required: true
+  - type: dropdown
+    id: usage
+    attributes:
+      label: How do you use it?
+      options:
+        - Action step (uses spidero/github-stats-card@v1)
+        - Reusable workflow (card.yml)
+        - Locally (python3 -m github_cards)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Tag you use (e.g. v1, v1.4.1) or commit
+      placeholder: v1
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect and what did you get? Screenshots of the card help.
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Workflow snippet
+      description: The step/job that uses the action (remove secrets)
+      render: yaml
+  - type: textarea
+    id: log
+    attributes:
+      label: Log output
+      description: Output of the "Generate" step, especially any "GraphQL error"
+      render: text

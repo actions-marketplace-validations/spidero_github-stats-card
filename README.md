@@ -11,6 +11,7 @@ Every card is rendered in a light and a dark version.
 | `stats`     | Total stars, commits this year, private contributions (last year), pull requests, issues, repositories contributed to, public repos, total contributions (last year) |
 | `languages` | Top languages by code size in your own (non-fork) repositories |
 | `streak`    | Total contributions since you joined, current and longest daily streak |
+| `org`       | Organization: stars, forks, public/active repos, open issues & PRs, members, top languages (set `org`) |
 
 <img alt="GitHub stats card" src="https://raw.githubusercontent.com/spidero/spidero/output/github-stats-dark.svg#gh-dark-mode-only">
 <img alt="GitHub stats card" src="https://raw.githubusercontent.com/spidero/spidero/output/github-stats.svg#gh-light-mode-only">
@@ -18,8 +19,32 @@ Every card is rendered in a light and a dark version.
 <img alt="Top languages card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-languages.svg#gh-light-mode-only">
 <img alt="Streak card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-streak-dark.svg#gh-dark-mode-only">
 <img alt="Streak card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-streak.svg#gh-light-mode-only">
+<img alt="Organization card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-org-dark.svg#gh-dark-mode-only">
+<img alt="Organization card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-org.svg#gh-light-mode-only">
 
-Files are named `github-<card>.svg` (light) and `github-<card>-dark.svg` (dark).
+Files are named `github-<card>.svg` (light theme) and `github-<card>-<theme>.svg` (other themes).
+
+## Themes
+
+Pick any with `themes: dark,midnight` (or `all`). Gradient backgrounds are built in;
+`transparent` has no background and fits both light and dark pages with a single file.
+
+| | |
+|:--:|:--:|
+| `light`<br><img alt="light" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-stats.svg" width="360"> | `dark`<br><img alt="dark" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-stats-dark.svg" width="360"> |
+| `dimmed`<br><img alt="dimmed" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-stats-dimmed.svg" width="360"> | `transparent`<br><img alt="transparent" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-stats-transparent.svg" width="360"> |
+| `midnight`<br><img alt="midnight" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-stats-midnight.svg" width="360"> | `aurora`<br><img alt="aurora" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-stats-aurora.svg" width="360"> |
+| `sunset`<br><img alt="sunset" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-stats-sunset.svg" width="360"> | `forest`<br><img alt="forest" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-stats-forest.svg" width="360"> |
+| `mono`<br><img alt="mono" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-stats-mono.svg" width="360"> | `high-contrast`<br><img alt="high-contrast" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-stats-high-contrast.svg" width="360"> |
+
+Custom colors on top of any theme (e.g. your brand), validated hex values only:
+
+```yaml
+    themes: dark
+    colors: accent=#ff0066,title=#ff0066,bg2=#2a0018   # bg2 = gradient end
+```
+
+Keys: `bg`, `bg2`, `border`, `title`, `label`, `value`, `accent`, `track`.
 
 ## Quick start (reusable workflow)
 
@@ -59,13 +84,15 @@ Optional inputs of the reusable workflow:
 | `github_user_name` | repository owner          | User to generate the card for  |
 | `cards`            | `stats`                   | Comma-separated cards or `all` |
 | `include_private`  | `false`                   | Use private repos (needs `token`) |
+| `org`              |                           | Organization for the `org` card |
+| `colors`           |                           | Theme color overrides, see [Themes](#themes) |
 | `hide`             |                           | Items to hide, see [Options](#options) |
 | `exclude_repos`    |                           | Repository names to skip       |
 | `exclude_archived` | `false`                   | Skip archived repositories     |
 | `show_credit`      | `true`                    | Small project link in the corner |
 | `branch`           | `output`                  | Branch the SVG files go to     |
 | `title`            | per card                  | Custom title (all cards)       |
-| `themes`           | `light,dark`              | Themes to render               |
+| `themes`           | `light,dark`              | Themes to render or `all`, see [Themes](#themes) |
 
 Secret: `token` (optional), see [Private repositories](#private-repositories).
 
@@ -99,6 +126,8 @@ Then publish `dist/` the same way you publish your other files.
 | `github_user_name` | (required)            | User to generate the card for       |
 | `cards`            | `stats`               | Comma-separated cards or `all`      |
 | `include_private`  | `false`               | Use private repos (needs a PAT)     |
+| `org`              |                       | Organization for the `org` card     |
+| `colors`           |                       | Theme color overrides, see [Themes](#themes) |
 | `hide`             |                       | Items to hide, see [Options](#options) |
 | `exclude_repos`    |                       | Repository names to skip            |
 | `exclude_archived` | `false`               | Skip archived repositories          |
@@ -106,10 +135,15 @@ Then publish `dist/` the same way you publish your other files.
 | `output_dir`       | `dist`                | Where the SVG files are written     |
 | `token`            | `github.token`        | Token for the GitHub GraphQL API    |
 | `title`            | per card              | Custom title (all cards)            |
-| `themes`           | `light,dark`          | Themes to render                    |
+| `themes`           | `light,dark`          | Themes to render or `all`, see [Themes](#themes) |
 
 ## Options
 
+- `org`: organization login for the `org` card, e.g. `cards: org` + `org: my-company`.
+  Public repositories only. `cards: all` includes the `org` card only when `org` is set.
+  "Members" needs a token with organization read access (a PAT); with the default
+  `GITHUB_TOKEN` that row is simply left out. `hide` also works there (`stars`, `forks`, `repos`, `active`, `issues`, `prs`, `members`
+  and language names).
 - `hide`: comma-separated, case-insensitive. Stats rows: `stars`, `commits`, `private`,
   `prs`, `issues`, `contributed`, `repos`; and/or language names for the `languages` card
   (percentages are recomputed without them). Example: `hide: issues,private,html,css`.
@@ -197,6 +231,16 @@ GITHUB_TOKEN=$(gh auth token) python3 -m github_cards <you> /tmp/x --cards all -
 # render every card in every theme into preview/index.html and open it
 python3 preview.py samples/<you>.json
 ```
+
+## Development
+
+```sh
+python3 -m unittest discover -s tests -t .   # unit + render tests, offline
+python3 preview.py                           # visual check of every card x theme
+```
+
+Tests run on every push and pull request. Bug reports and ideas: use the
+[issue forms](https://github.com/spidero/github-stats-card/issues/new/choose).
 
 ## License
 

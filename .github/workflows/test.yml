@@ -16,12 +16,17 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Unit tests (offline, sample data)
+        run: python3 -m unittest discover -s tests -t . -v
+
       - name: Run action from this checkout
         uses: ./
         with:
           github_user_name: ${{ github.repository_owner }}
           output_dir: dist
           cards: all
+          org: actions
+          themes: all
 
       - name: Check output (every card x theme)
         run: |
@@ -47,5 +52,7 @@ jobs:
     uses: ./.github/workflows/card.yml
     with:
       cards: all
+      org: actions
+      themes: all
     permissions:
       contents: write

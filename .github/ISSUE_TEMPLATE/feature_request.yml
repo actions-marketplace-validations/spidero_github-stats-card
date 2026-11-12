@@ -1,0 +1,28 @@
+name: Feature request
+description: Idea for a new card, theme or option
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options: [New card, New theme, New option, Change to an existing card, Other]
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+      description: What should it show or do? A sketch or example helps.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is it useful?
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contributing
+      options:
+        - label: I'd like to implement it myself (see "Adding a new card" in README)

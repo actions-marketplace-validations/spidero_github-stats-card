@@ -1,3 +1,3 @@
 """GitHub stats cards: small SVG graphics generated from the GitHub GraphQL API."""
 
-__version__ = "1.3.0"
+__version__ = "1.4.1"

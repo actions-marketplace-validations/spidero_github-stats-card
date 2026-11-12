@@ -10,7 +10,18 @@ class GitHubAPI:
         self.token = token
 
     def query(self, query, **variables):
-        """Run a GraphQL query and return its "data" object."""
+        """Run a GraphQL query and return its "data" object (exit on errors)."""
+        payload = self._post(query, variables)
+        if payload.get("errors"):
+            raise SystemExit(f"GraphQL error: {payload['errors']}")
+        return payload["data"]
+
+    def try_query(self, query, **variables):
+        """Like query(), but return None on GraphQL errors (e.g. fields the token can't access)."""
+        payload = self._post(query, variables)
+        return None if payload.get("errors") else payload["data"]
+
+    def _post(self, query, variables):
         req = urllib.request.Request(
             API_URL,
             data=json.dumps({"query": query, "variables": variables}).encode(),
@@ -21,10 +32,7 @@ class GitHubAPI:
             },
         )
         with urllib.request.urlopen(req, timeout=30) as resp:
-            payload = json.load(resp)
-        if payload.get("errors"):
-            raise SystemExit(f"GraphQL error: {payload['errors']}")
-        return payload["data"]
+            return json.load(resp)
 
     def paginate(self, query, path, **variables):
         """Yield every page of a connection.
