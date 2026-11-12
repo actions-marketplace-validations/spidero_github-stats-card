@@ -8,12 +8,14 @@ DESCRIPTION = "Organization stats with top languages (set the `org` option)"
 ROWS = ["stars", "forks", "repos", "active", "issues", "prs", "members"]
 TOP = 5
 
+# Separate query: the default GITHUB_TOKEN may not read members ("Resource not accessible")
+MEMBERS = "query($org: String!) { organization(login: $org) { membersWithRole { totalCount } } }"
+
 QUERY = """
 query($org: String!, $cursor: String) {
   organization(login: $org) {
     name
     login
-    membersWithRole { totalCount }
     repositories(first: 100, after: $cursor, privacy: PUBLIC, isFork: false) {
       pageInfo { hasNextPage endCursor }
       nodes {
@@ -59,10 +61,12 @@ def fetch(api, login, options):
                 sizes[name] = sizes.get(name, 0) + edge["size"]
                 colors[name] = edge["node"]["color"]
     langs = sorted(sizes.items(), key=lambda kv: kv[1], reverse=True)
+    m = api.try_query(MEMBERS, org=org_login)
     return {
         "name": org["name"] or org["login"],
         "login": org["login"],
-        "members": org["membersWithRole"]["totalCount"],
+        # None when the token has no access; the row is then left out
+        "members": m["organization"]["membersWithRole"]["totalCount"] if m else None,
         **totals,
         "languages": [{"name": n, "size": s, "color": colors[n]} for n, s in langs],
     }
@@ -80,7 +84,7 @@ def render(data, theme, options):
         "members": "Members",
     }
     hide = hidden(options)
-    rows = [(labels[k], data[k]) for k in ROWS if k not in hide]
+    rows = [(labels[k], data[k]) for k in ROWS if k not in hide and data.get(k) is not None]
     body = [stat_row(theme, i, label, human(v), value_x=210) for i, (label, v) in enumerate(rows)]
 
     # Right column: top languages (hide also removes languages)

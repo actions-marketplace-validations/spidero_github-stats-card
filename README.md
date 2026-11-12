@@ -141,7 +141,8 @@ Then publish `dist/` the same way you publish your other files.
 
 - `org`: organization login for the `org` card, e.g. `cards: org` + `org: my-company`.
   Public repositories only. `cards: all` includes the `org` card only when `org` is set.
-  `hide` also works there (`stars`, `forks`, `repos`, `active`, `issues`, `prs`, `members`
+  "Members" needs a token with organization read access (a PAT); with the default
+  `GITHUB_TOKEN` that row is simply left out. `hide` also works there (`stars`, `forks`, `repos`, `active`, `issues`, `prs`, `members`
   and language names).
 - `hide`: comma-separated, case-insensitive. Stats rows: `stars`, `commits`, `private`,
   `prs`, `issues`, `contributed`, `repos`; and/or language names for the `languages` card
