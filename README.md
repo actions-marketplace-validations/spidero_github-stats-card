@@ -232,6 +232,16 @@ GITHUB_TOKEN=$(gh auth token) python3 -m github_cards <you> /tmp/x --cards all -
 python3 preview.py samples/<you>.json
 ```
 
+## Development
+
+```sh
+python3 -m unittest discover -s tests -t .   # unit + render tests, offline
+python3 preview.py                           # visual check of every card x theme
+```
+
+Tests run on every push and pull request. Bug reports and ideas: use the
+[issue forms](https://github.com/spidero/github-stats-card/issues/new/choose).
+
 ## License
 
 [MIT](LICENSE)

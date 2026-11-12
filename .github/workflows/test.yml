@@ -16,6 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Unit tests (offline, sample data)
+        run: python3 -m unittest discover -s tests -t . -v
+
       - name: Run action from this checkout
         uses: ./
         with:
