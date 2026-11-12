@@ -1,0 +1,68 @@
+# Weekly usage report: traffic (views, clones, referrers) and public code that
+# references this repository. History is kept in usage/ on the "output" branch
+# (the traffic API only returns the last 14 days), the report is shown in the job summary.
+#
+# Needs the USAGE_TOKEN secret: a fine-grained personal access token limited to this
+# repository with "Administration: read" (traffic) - code search works with any user token.
+name: Usage report
+
+on:
+  schedule:
+    - cron: "15 6 * * 1"   # Mondays 06:15 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: usage-report
+  cancel-in-progress: false
+
+jobs:
+  usage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: src
+
+      - name: Check token
+        env:
+          USAGE_TOKEN: ${{ secrets.USAGE_TOKEN }}
+        run: |
+          if [ -z "$USAGE_TOKEN" ]; then
+            echo "::warning::USAGE_TOKEN secret is not set - traffic and code search will likely fail with github.token"
+          fi
+
+      - name: Fetch history from output branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git init -q site && cd site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git fetch -q --depth 1 origin output; then
+            git checkout -q -b output FETCH_HEAD
+          else
+            git checkout -q --orphan output
+          fi
+
+      - name: Build report
+        env:
+          GH_TOKEN: ${{ secrets.USAGE_TOKEN || github.token }}
+          DATA_DIR: site/usage
+        run: python3 src/scripts/usage_report.py
+
+      - name: Push history
+        working-directory: site
+        run: |
+          set -euo pipefail
+          git add usage
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -q -m "Update usage report"
+            git push -q origin HEAD:output
+          fi
