@@ -34,6 +34,13 @@ def card(theme, title, body, height, width=WIDTH, extra_css="", footer=True):
         if SHOW_CREDIT:
             foot += (f'<a href="https://github.com/{REPO}" target="_blank">'
                      f'<text x="25" y="{height - 12}" class="small credit">{REPO}</text></a>')
+    # Optional gradient background (theme key bg2)
+    fill, defs = c["bg"], ""
+    if c.get("bg2") and c["bg"] != "none":
+        fill = "url(#bg)"
+        defs = (f'<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">'
+                f'<stop offset="0" stop-color="{c["bg"]}"/><stop offset="1" stop-color="{c["bg2"]}"/>'
+                f'</linearGradient></defs>')
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-label="{title}">
 <title>{title}</title>
 <style>
@@ -49,7 +56,7 @@ def card(theme, title, body, height, width=WIDTH, extra_css="", footer=True):
   @media (prefers-reduced-motion: reduce) {{ * {{ animation: none !important; }} }}
 {extra_css}
 </style>
-<rect x="0.5" y="0.5" width="{width - 1}" height="{height - 1}" rx="6" fill="{c["bg"]}" stroke="{c["border"]}"/>
+{defs}<rect x="0.5" y="0.5" width="{width - 1}" height="{height - 1}" rx="6" fill="{fill}" stroke="{c["border"]}"/>
 <text x="25" y="35" class="title">{title}</text>
 {body}
 {foot}

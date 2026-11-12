@@ -10,13 +10,21 @@ on:
         type: string
         default: ""
       cards:
-        description: Comma-separated cards (stats, languages, streak) or "all".
+        description: Comma-separated cards (stats, languages, streak, org) or "all".
         type: string
         default: stats
       include_private:
         description: Include private repos where a card supports it (needs the token secret).
         type: boolean
         default: false
+      org:
+        description: Organization login for the "org" card.
+        type: string
+        default: ""
+      colors:
+        description: Theme color overrides, e.g. "accent=#ff0066".
+        type: string
+        default: ""
       hide:
         description: Stats rows and/or language names to hide.
         type: string
@@ -65,6 +73,8 @@ jobs:
           include_private: ${{ inputs.include_private }}
           show_credit: ${{ inputs.show_credit }}
           hide: ${{ inputs.hide }}
+          org: ${{ inputs.org }}
+          colors: ${{ inputs.colors }}
           exclude_repos: ${{ inputs.exclude_repos }}
           exclude_archived: ${{ inputs.exclude_archived }}
           title: ${{ inputs.title }}

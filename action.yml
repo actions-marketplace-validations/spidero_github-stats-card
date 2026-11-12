@@ -10,7 +10,7 @@ inputs:
     description: GitHub username to generate the card for.
     required: true
   cards:
-    description: Comma-separated cards to generate (stats, languages, streak) or "all".
+    description: Comma-separated cards to generate (stats, languages, streak, org) or "all".
     required: false
     default: stats
   output_dir:
@@ -29,6 +29,16 @@ inputs:
       Needs a personal access token in `token`.
     required: false
     default: "false"
+  org:
+    description: Organization login for the "org" card (defaults to github_user_name).
+    required: false
+    default: ""
+  colors:
+    description: >
+      Override theme colors, e.g. "accent=#ff0066,bg=#101010".
+      Keys: bg, bg2 (gradient end), border, title, label, value, accent, track.
+    required: false
+    default: ""
   hide:
     description: >
       Comma-separated items to hide: stats rows (stars, commits, private, prs, issues,
@@ -52,7 +62,9 @@ inputs:
     required: false
     default: ""
   themes:
-    description: Comma-separated list of themes to render (light, dark).
+    description: >
+      Comma-separated themes or "all": light, dark, dimmed, transparent, midnight, aurora,
+      sunset, forest, mono, high-contrast.
     required: false
     default: light,dark
 
@@ -72,6 +84,8 @@ runs:
         CARD_PRIVATE: ${{ inputs.include_private }}
         CARD_CREDIT: ${{ inputs.show_credit }}
         CARD_HIDE: ${{ inputs.hide }}
+        CARD_ORG: ${{ inputs.org }}
+        CARD_COLORS: ${{ inputs.colors }}
         CARD_EXCLUDE: ${{ inputs.exclude_repos }}
         CARD_EXCL_ARCHIVED: ${{ inputs.exclude_archived }}
       run: |
@@ -81,4 +95,5 @@ runs:
         [ "$CARD_EXCL_ARCHIVED" = "true" ] && extra+=(--exclude-archived)
         PYTHONPATH="$GITHUB_ACTION_PATH" python3 -m github_cards "$CARD_USER" "$CARD_OUT" \
           --cards "$CARD_CARDS" --title "$CARD_TITLE" --themes "$CARD_THEMES" \
-          --hide "$CARD_HIDE" --exclude-repos "$CARD_EXCLUDE" "${extra[@]}"
+          --hide "$CARD_HIDE" --exclude-repos "$CARD_EXCLUDE" \
+          --org "$CARD_ORG" --colors "$CARD_COLORS" "${extra[@]}"

@@ -5,33 +5,33 @@
     "languages": [
       {
         "name": "PHP",
-        "size": 5244918,
+        "size": 5266449,
         "color": "#4F5D95"
       },
       {
         "name": "Smarty",
-        "size": 530305,
+        "size": 533576,
         "color": "#f0c040"
       },
       {
         "name": "Python",
-        "size": 311245,
+        "size": 318310,
         "color": "#3572A5"
       },
       {
         "name": "CSS",
-        "size": 228824,
+        "size": 241203,
         "color": "#663399"
+      },
+      {
+        "name": "Shell",
+        "size": 190414,
+        "color": "#89e051"
       },
       {
         "name": "JavaScript",
         "size": 124438,
         "color": "#f1e05a"
-      },
-      {
-        "name": "Shell",
-        "size": 121485,
-        "color": "#89e051"
       },
       {
         "name": "Blade",
@@ -44,14 +44,14 @@
         "color": "#3178c6"
       },
       {
+        "name": "HTML",
+        "size": 46771,
+        "color": "#e34c26"
+      },
+      {
         "name": "Twig",
         "size": 38394,
         "color": "#c1d026"
-      },
-      {
-        "name": "HTML",
-        "size": 37901,
-        "color": "#e34c26"
       },
       {
         "name": "C++",
@@ -65,7 +65,7 @@
       },
       {
         "name": "Dockerfile",
-        "size": 11893,
+        "size": 12309,
         "color": "#384d54"
       },
       {
@@ -100,29 +100,147 @@
       }
     ]
   },
+  "org": {
+    "name": "GitHub Actions",
+    "login": "actions",
+    "members": 8,
+    "stars": 105128,
+    "forks": 35446,
+    "repos": 77,
+    "active": 29,
+    "issues": 3432,
+    "prs": 1713,
+    "languages": [
+      {
+        "name": "C#",
+        "size": 7134699,
+        "color": "#7355dd"
+      },
+      {
+        "name": "TypeScript",
+        "size": 5818631,
+        "color": "#3178c6"
+      },
+      {
+        "name": "Go",
+        "size": 2778856,
+        "color": "#00ADD8"
+      },
+      {
+        "name": "PowerShell",
+        "size": 965467,
+        "color": "#012456"
+      },
+      {
+        "name": "Shell",
+        "size": 734316,
+        "color": "#89e051"
+      },
+      {
+        "name": "JavaScript",
+        "size": 642308,
+        "color": "#f1e05a"
+      },
+      {
+        "name": "HTML",
+        "size": 232282,
+        "color": "#e34c26"
+      },
+      {
+        "name": "HCL",
+        "size": 215816,
+        "color": "#844FBA"
+      },
+      {
+        "name": "Python",
+        "size": 118024,
+        "color": "#3572A5"
+      },
+      {
+        "name": "Go Template",
+        "size": 114290,
+        "color": "#00ADD8"
+      },
+      {
+        "name": "Dockerfile",
+        "size": 62058,
+        "color": "#384d54"
+      },
+      {
+        "name": "Ruby",
+        "size": 54792,
+        "color": "#701516"
+      },
+      {
+        "name": "Makefile",
+        "size": 31205,
+        "color": "#427819"
+      },
+      {
+        "name": "CSS",
+        "size": 13418,
+        "color": "#663399"
+      },
+      {
+        "name": "Batchfile",
+        "size": 3888,
+        "color": "#C1F12E"
+      },
+      {
+        "name": "Java",
+        "size": 2758,
+        "color": "#b07219"
+      },
+      {
+        "name": "Swift",
+        "size": 2148,
+        "color": "#F05138"
+      },
+      {
+        "name": "AppleScript",
+        "size": 1802,
+        "color": "#101F1F"
+      },
+      {
+        "name": "Elixir",
+        "size": 1184,
+        "color": "#6e4a7e"
+      },
+      {
+        "name": "C++",
+        "size": 1126,
+        "color": "#f34b7d"
+      },
+      {
+        "name": "Haskell",
+        "size": 165,
+        "color": "#5e5086"
+      }
+    ]
+  },
   "stats": {
     "name": "Piotr Skwarna",
     "year": 2026,
     "stars": 12,
     "forks": 2,
     "repos": 22,
-    "commits": 65,
-    "prs": 177,
+    "commits": 68,
+    "prs": 184,
     "issues": 15,
     "contributed": 2,
-    "followers": 3,
-    "contributions": 1257,
-    "private": 1168
+    "followers": 4,
+    "contributions": 1306,
+    "private": 1214
   },
   "streak": {
     "name": "Piotr Skwarna",
-    "total": 1694,
+    "total": 1743,
     "first": "2012-07-05",
-    "today": "2026-11-10",
+    "today": "2026-11-12",
     "current": {
-      "length": 23,
+      "length": 24,
       "start": "2026-10-19",
-      "end": "2026-11-10"
+      "end": "2026-11-11"
     },
     "longest": {
       "length": 25,
