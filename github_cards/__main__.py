@@ -39,6 +39,11 @@ def main():
     ap.add_argument("--exclude-archived", action="store_true", help="skip archived repositories")
     ap.add_argument("--no-credit", action="store_true",
                     help="hide the small project link in the bottom-left corner")
+    ap.add_argument("--activity-style", default="line", choices=["line", "years", "both"],
+                    help="'activity' card: one continuous line (line), one line per year (years) "
+                         "or both (the per-year one goes to github-activity-years*.svg)")
+    ap.add_argument("--activity-years", type=int, default=0,
+                    help="'activity' card: number of years shown (0 = auto)")
     ap.add_argument("--data", help="render from a JSON file (from --dump-data) instead of the API")
     ap.add_argument("--dump-data", help="also save fetched data to this JSON file")
     ap.add_argument("--list", action="store_true", help="list available cards and exit")
@@ -60,6 +65,8 @@ def main():
     for t in themes:
         if t in THEMES:
             THEMES[t].update(overrides)
+    if args.activity_years < 0:
+        ap.error("--activity-years must be 0 (auto) or more")
     if not names or set(names) - set(cards):
         ap.error(f"unknown card(s): {sorted(set(names) - set(cards))}; available: {', '.join(cards)}")
     if not themes or set(themes) - set(THEMES):
@@ -72,6 +79,8 @@ def main():
         "exclude_repos": split(args.exclude_repos),
         "exclude_archived": args.exclude_archived,
         "org": args.org.strip(),
+        "activity_style": args.activity_style,
+        "activity_years": args.activity_years,
     }
 
     if args.data:
@@ -100,11 +109,14 @@ def main():
     svg.SHOW_CREDIT = not args.no_credit
     os.makedirs(args.out_dir, exist_ok=True)
     for name in names:
-        for theme in themes:
-            path = os.path.join(args.out_dir, output_name(name, theme))
-            with open(path, "w", encoding="utf-8") as f:
-                f.write(cards[name].render(data[name], theme, options))
-            print(f"wrote {path}")
+        # A card may render several variants of the same data: [(file name, options)]
+        variants = getattr(cards[name], "variants", lambda o: [("", o)])(options)
+        for suffix, opts in variants:
+            for theme in themes:
+                path = os.path.join(args.out_dir, output_name(name + suffix, theme))
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(cards[name].render(data[name], theme, opts))
+                print(f"wrote {path}")
 
 
 if __name__ == "__main__":

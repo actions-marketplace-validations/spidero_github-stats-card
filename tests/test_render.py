@@ -68,6 +68,24 @@ class TestRender(unittest.TestCase):
         svg = self.cards["org"].render(data, "light", {})
         self.assertNotIn("Members:", " ".join(texts(svg)))
 
+    def test_activity_styles(self):
+        mod, data = self.cards["activity"], self.data["activity"]
+        for style in ("line", "years"):
+            for years in (0, 1, 3, 8):
+                with self.subTest(style=style, years=years):
+                    svg = mod.render(data, "dark", {"activity_style": style, "activity_years": years})
+                    ET.fromstring(svg)
+                    self.assertIn("<path", svg)
+        joined = " ".join(texts(mod.render(data, "light", {"activity_style": "years", "activity_years": 2})))
+        self.assertIn("Jan", joined)
+        self.assertIn(f"{data['today'][:4]}:", joined)  # legend: newest year
+
+    def test_activity_legend_wraps(self):
+        mod, data = self.cards["activity"], self.data["activity"]
+        short = ET.fromstring(mod.render(data, "light", {"activity_style": "years", "activity_years": 2}))
+        long = ET.fromstring(mod.render(data, "light", {"activity_style": "years", "activity_years": 10}))
+        self.assertGreater(int(long.get("height")), int(short.get("height")))
+
     def test_credit_toggle(self):
         from github_cards import svg as svgmod
         try:
@@ -100,10 +118,19 @@ class TestCLI(unittest.TestCase):
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertNotIn("github-org.svg", os.listdir(out))
 
+    def test_activity_both_writes_two_files(self):
+        with tempfile.TemporaryDirectory() as out:
+            r = self.run_cli("--data", SAMPLE, "--cards", "activity", "--activity-style", "both", "x", out)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual(sorted(os.listdir(out)), ["github-activity-dark.svg", "github-activity-years-dark.svg",
+                                                       "github-activity-years.svg", "github-activity.svg"])
+
     def test_errors(self):
         self.assertNotEqual(self.run_cli("--data", SAMPLE, "--cards", "nope", "x", "/tmp").returncode, 0)
         self.assertNotEqual(self.run_cli("--data", SAMPLE, "--themes", "nope", "x", "/tmp").returncode, 0)
         self.assertNotEqual(self.run_cli("--data", SAMPLE, "--colors", "accent=red", "x", "/tmp").returncode, 0)
+        self.assertNotEqual(self.run_cli("--data", SAMPLE, "--activity-style", "bars", "x", "/tmp").returncode, 0)
+        self.assertNotEqual(self.run_cli("--data", SAMPLE, "--activity-years", "-1", "x", "/tmp").returncode, 0)
 
 
 if __name__ == "__main__":
