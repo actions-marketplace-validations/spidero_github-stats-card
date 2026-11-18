@@ -27,6 +27,7 @@ jobs:
           cards: all
           org: actions
           themes: all
+          activity_style: both
 
       - name: Check output (every card x theme)
         run: |
@@ -36,6 +37,7 @@ jobs:
               grep -q '<svg' "$f" && echo "ok: $f"
             done
           done
+          grep -q '<svg' dist/github-activity-years-dark.svg && echo "ok: activity-years"
 
       - name: Offline preview from sample data
         run: python3 preview.py && ls preview/
@@ -54,5 +56,6 @@ jobs:
       cards: all
       org: actions
       themes: all
+      activity_style: both
     permissions:
       contents: write

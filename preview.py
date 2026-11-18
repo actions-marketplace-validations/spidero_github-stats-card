@@ -15,10 +15,12 @@ from github_cards.themes import THEMES
 sample = sys.argv[1] if len(sys.argv) > 1 else "samples/spidero.json"
 out = "preview"
 subprocess.run([sys.executable, "-m", "github_cards", "--data", sample, "--cards", "all",
-                "--themes", ",".join(THEMES), "x", out], check=True, stdout=subprocess.DEVNULL)
+                "--themes", ",".join(THEMES), "--activity-style", "both", "x", out], check=True, stdout=subprocess.DEVNULL)
 
 rows = []
-for name, mod in load_cards().items():
+files = [(name + suffix, mod) for name, mod in load_cards().items()
+         for suffix, _ in getattr(mod, "variants", lambda o: [("", o)])({"activity_style": "both"})]
+for name, mod in files:
     imgs = "".join(
         f'<div style="background:{"#8a8f98" if THEMES[t]["bg"] == "none" else THEMES[t]["bg"]};padding:16px">'
         f'<div style="font:12px sans-serif;color:#999">{t}</div><img src="{output_name(name, t)}"></div>'

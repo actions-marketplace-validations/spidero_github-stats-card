@@ -1,6 +1,7 @@
 """Unit tests for pure helpers (no network)."""
 import unittest
 
+from github_cards.cards.activity import monthly, nice_max, series
 from github_cards.cards.streak import streaks
 from github_cards.repo_filter import hidden, keep_repo
 from github_cards.svg import fmt_date, human
@@ -86,6 +87,29 @@ class TestFilters(unittest.TestCase):
         self.assertEqual(hidden({"hide": ["Issues", "HTML"]}), {"issues", "html"})
         self.assertEqual(hidden({}), set())
 
+
+class TestActivity(unittest.TestCase):
+    def test_monthly(self):
+        self.assertEqual(monthly([("2025-01-01", 2), ("2025-01-31", 3), ("2025-02-01", 1)]),
+                         {"2025-01": 5, "2025-02": 1})
+
+    def test_nice_max(self):
+        self.assertEqual(nice_max(0), 4)
+        self.assertEqual(nice_max(664), 800)
+        self.assertEqual(nice_max(81), 100)
+        for v in (5, 13, 99, 1001, 37000):
+            self.assertGreaterEqual(nice_max(v), v)
+
+    def test_series_auto_and_limit(self):
+        data = {"today": "2026-03-10", "months": {"2023-05": 4, "2024-01": 0, "2026-02": 1}}
+        line = series(data, 0, "line")
+        self.assertEqual([y for y, _ in line], [2023, 2024, 2025, 2026])  # from first active year
+        self.assertEqual(len(line[-1][1]), 3)  # current year stops at the current month
+        self.assertEqual([y for y, _ in series(data, 0, "years")], [2024, 2025, 2026])
+        self.assertEqual([y for y, _ in series(data, 1, "line")], [2026])
+
+    def test_series_no_contributions(self):
+        self.assertEqual(series({"today": "2026-01-05", "months": {}}, 0, "line"), [(2026, [0])])
 
 if __name__ == "__main__":
     unittest.main()

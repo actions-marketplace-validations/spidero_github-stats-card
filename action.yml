@@ -10,7 +10,7 @@ inputs:
     description: GitHub username to generate the card for.
     required: true
   cards:
-    description: Comma-separated cards to generate (stats, languages, streak, org) or "all".
+    description: Comma-separated cards to generate (stats, languages, streak, activity, org) or "all".
     required: false
     default: stats
   output_dir:
@@ -53,6 +53,14 @@ inputs:
     description: '"true" skips archived repositories (stars, repo count, languages).'
     required: false
     default: "false"
+  activity_style:
+    description: '"activity" card: "line" (one line across the years), "years" (one line per year, Jan-Dec) or "both" (second file github-activity-years*.svg).'
+    required: false
+    default: line
+  activity_years:
+    description: '"activity" card: number of recent years shown; "0" = auto (all years for line, last 3 for years).'
+    required: false
+    default: "0"
   show_credit:
     description: '"false" hides the small project link in the bottom-left corner of the cards.'
     required: false
@@ -88,6 +96,8 @@ runs:
         CARD_COLORS: ${{ inputs.colors }}
         CARD_EXCLUDE: ${{ inputs.exclude_repos }}
         CARD_EXCL_ARCHIVED: ${{ inputs.exclude_archived }}
+        CARD_ACT_STYLE: ${{ inputs.activity_style }}
+        CARD_ACT_YEARS: ${{ inputs.activity_years }}
       run: |
         extra=()
         [ "$CARD_PRIVATE" = "true" ] && extra+=(--include-private)
@@ -96,4 +106,5 @@ runs:
         PYTHONPATH="$GITHUB_ACTION_PATH" python3 -m github_cards "$CARD_USER" "$CARD_OUT" \
           --cards "$CARD_CARDS" --title "$CARD_TITLE" --themes "$CARD_THEMES" \
           --hide "$CARD_HIDE" --exclude-repos "$CARD_EXCLUDE" \
-          --org "$CARD_ORG" --colors "$CARD_COLORS" "${extra[@]}"
+          --org "$CARD_ORG" --colors "$CARD_COLORS" \
+          --activity-style "${CARD_ACT_STYLE:-line}" --activity-years "${CARD_ACT_YEARS:-0}" "${extra[@]}"

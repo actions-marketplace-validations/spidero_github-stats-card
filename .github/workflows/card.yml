@@ -10,7 +10,7 @@ on:
         type: string
         default: ""
       cards:
-        description: Comma-separated cards (stats, languages, streak, org) or "all".
+        description: Comma-separated cards (stats, languages, streak, activity, org) or "all".
         type: string
         default: stats
       include_private:
@@ -37,6 +37,14 @@ on:
         description: Skip archived repositories.
         type: boolean
         default: false
+      activity_style:
+        description: '"activity" card: "line", "years" or "both".'
+        type: string
+        default: line
+      activity_years:
+        description: '"activity" card: number of years shown (0 = auto).'
+        type: number
+        default: 0
       show_credit:
         description: Show the small project link in the bottom-left corner.
         type: boolean
@@ -77,6 +85,8 @@ jobs:
           colors: ${{ inputs.colors }}
           exclude_repos: ${{ inputs.exclude_repos }}
           exclude_archived: ${{ inputs.exclude_archived }}
+          activity_style: ${{ inputs.activity_style }}
+          activity_years: ${{ inputs.activity_years }}
           title: ${{ inputs.title }}
           themes: ${{ inputs.themes }}
 

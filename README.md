@@ -16,6 +16,7 @@ No hosted service that can be paused or rate-limited, no dependencies: plain Pyt
 | `stats`     | Total stars, commits this year, private contributions (last year), pull requests, issues, repositories contributed to, public repos, total contributions (last year) |
 | `languages` | Top languages by code size in your own (non-fork) repositories |
 | `streak`    | Total contributions since you joined, current and longest daily streak |
+| `activity`  | Monthly contributions over the years as a line chart: one continuous line or one line per year (`activity_style`) |
 | `org`       | Organization: stars, forks, public/active repos, open issues & PRs, members, top languages (set `org`) |
 
 <img alt="GitHub stats card" src="https://raw.githubusercontent.com/spidero/spidero/output/github-stats-dark.svg#gh-dark-mode-only">
@@ -24,6 +25,10 @@ No hosted service that can be paused or rate-limited, no dependencies: plain Pyt
 <img alt="Top languages card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-languages.svg#gh-light-mode-only">
 <img alt="Streak card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-streak-dark.svg#gh-dark-mode-only">
 <img alt="Streak card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-streak.svg#gh-light-mode-only">
+<img alt="Activity card (activity_style: line)" src="docs/activity-line-dark.png#gh-dark-mode-only" width="495">
+<img alt="Activity card (activity_style: line)" src="docs/activity-line.png#gh-light-mode-only" width="495">
+<img alt="Activity card (activity_style: years)" src="docs/activity-years-dark.png#gh-dark-mode-only" width="495">
+<img alt="Activity card (activity_style: years)" src="docs/activity-years.png#gh-light-mode-only" width="495">
 <img alt="Organization card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-org-dark.svg#gh-dark-mode-only">
 <img alt="Organization card" src="https://raw.githubusercontent.com/spidero/github-stats-card/output/github-org.svg#gh-light-mode-only">
 
@@ -94,6 +99,8 @@ Optional inputs of the reusable workflow:
 | `hide`             |                           | Items to hide, see [Options](#options) |
 | `exclude_repos`    |                           | Repository names to skip       |
 | `exclude_archived` | `false`                   | Skip archived repositories     |
+| `activity_style`   | `line`                    | `activity` card: `line`, `years` or `both`, see [Options](#options) |
+| `activity_years`   | `0` (auto)                | `activity` card: number of years shown |
 | `show_credit`      | `true`                    | Small project link in the corner |
 | `branch`           | `output`                  | Branch the SVG files go to     |
 | `title`            | per card                  | Custom title (all cards)       |
@@ -136,6 +143,8 @@ Then publish `dist/` the same way you publish your other files.
 | `hide`             |                       | Items to hide, see [Options](#options) |
 | `exclude_repos`    |                       | Repository names to skip            |
 | `exclude_archived` | `false`               | Skip archived repositories          |
+| `activity_style`   | `line`                | `activity` card: `line`, `years` or `both`, see [Options](#options) |
+| `activity_years`   | `0` (auto)            | `activity` card: number of years shown |
 | `show_credit`      | `true`                | Small project link in the corner    |
 | `output_dir`       | `dist`                | Where the SVG files are written     |
 | `token`            | `github.token`        | Token for the GitHub GraphQL API    |
@@ -152,6 +161,12 @@ Then publish `dist/` the same way you publish your other files.
 - `hide`: comma-separated, case-insensitive. Stats rows: `stars`, `commits`, `private`,
   `prs`, `issues`, `contributed`, `repos`; and/or language names for the `languages` card
   (percentages are recomputed without them). Example: `hide: issues,private,html,css`.
+- `activity_style` (`activity` card): `line` draws one continuous line of monthly contributions
+  across the years; `years` draws one line per year on a Jan-Dec axis to compare years.
+  `activity_years` limits how many recent years are shown; `0` (default) means every year
+  with contributions for `line` and the last 3 years for `years`. `both` writes both charts:
+  `github-activity.svg` (line) and `github-activity-years.svg` (one line per year), plus the
+  other themes as usual.
 - `exclude_repos` / `exclude_archived`: skip repositories when counting stars, public repos
   and languages. Commits, PRs, issues and contributions are your activity and are reported
   by GitHub as totals, so they cannot be filtered per repository.
@@ -210,7 +225,8 @@ query($login: String!) {
 
 
 def fetch(api, login, options):
-    # options: title, hide, include_private, exclude_repos, exclude_archived
+    # options: title, hide, include_private, exclude_repos, exclude_archived, org,
+    #          activity_style, activity_years
     # Return plain JSON-serialisable data (it is also saved as sample data)
     user = api.query(QUERY, login=login)["user"]
     return {"name": user["name"] or user["login"], "followers": user["followers"]["totalCount"]}
