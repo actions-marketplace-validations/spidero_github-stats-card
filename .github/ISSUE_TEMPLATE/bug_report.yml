@@ -10,7 +10,7 @@ body:
     attributes:
       label: Card(s)
       multiple: true
-      options: [stats, languages, streak, org, all / not card-specific]
+      options: [stats, languages, streak, activity, org, all / not card-specific]
     validations:
       required: true
   - type: dropdown
