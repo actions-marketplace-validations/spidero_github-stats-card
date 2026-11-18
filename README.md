@@ -204,7 +204,15 @@ Notes:
 ```sh
 python3 -m github_cards --list                                    # available cards
 GITHUB_TOKEN=$(gh auth token) python3 -m github_cards <you> dist --cards all [--include-private]
+python3 -m github_cards --help                                    # every option
 ```
+
+`github_user_name` and `output_dir` are the two positional arguments and `token` is the
+`GITHUB_TOKEN` environment variable. Every other action input has a CLI flag with the same
+name in kebab case (`activity_style` -> `--activity-style`, `exclude_repos` -> `--exclude-repos`);
+`true`/`false` inputs are switches:
+`include_private: true` -> `--include-private`, `exclude_archived: true` -> `--exclude-archived`,
+`show_credit: false` -> `--no-credit`.
 
 ## Adding a new card
 
